@@ -1,0 +1,45 @@
+VPATH=../src
+INCL=../include
+ROOT=..
+
+ifeq ($(OS),Windows_NT)
+
+FLAGS= /MDd /WX /Zi /nologo /DEBUG /GS /EHsc /DWINDOWS
+CC=cl /c /I$(INCL)
+OBJECTS=$(patsubst %.cpp,%.obj,$(notdir $(wildcard ../src/*.cpp)))
+
+$(ROOT)\bin\msync: $(OBJECTS)
+	erase $(ROOT)\bin /Q
+	rmdir $(ROOT)\bin /Q
+	mkdir $(ROOT)\bin
+	link /OUT:$(ROOT)\bin\msync.exe $(OBJECTS) ws2_32.lib
+
+%.obj: %.cpp
+	$(CC) $(FLAGS) $<
+
+
+clean:
+	erase *.obj
+
+
+else
+
+FLAGS=-g -c -Wall -pedantic 
+CC=g++ -I $(INCL) 
+OBJECTS=$(patsubst %.cpp,%.o,$(notdir $(wildcard ../src/*.cpp)))
+
+$(ROOT)/bin/msync: $(OBJECTS)
+	mkdir -p $(ROOT)/bin
+	$(CC) -o $(ROOT)/bin/msync $(OBJECTS)
+
+%.o: %.cpp
+	$(CC) $(FLAGS) -o $@ $<
+
+
+clean:
+	rm -rf *.o
+
+endif
+
+
+
